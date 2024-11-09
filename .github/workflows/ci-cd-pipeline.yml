@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+# Activar el flujo de trabajo en eventos de push a ramas específicas
+on:
+  push:
+    branches:
+      - main  # O la rama que estés utilizando para producción
+  pull_request:
+    branches:
+      - main  # Cuando se realice un PR a la rama principal
+
+# Definir los trabajos a realizar
+jobs:
+  # Trabajo para instalar dependencias, ejecutar pruebas y compilar el proyecto
+  build:
+    runs-on: ubuntu-latest  # Puede cambiarse por windows-latest si es necesario
+
+    steps:
+      # Paso 1: Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Usa la versión de Node.js que necesites
+
+      # Paso 3: Instalar las dependencias
+      - name: Install dependencies
+        run: npm install
+
+      # Paso 4: Ejecutar pruebas con Jest
+      - name: Run Jest tests
+        run: npm test
+
+      # Paso 5: Compilar el proyecto
+      - name: Build project with Webpack
+        run: npm run build
+
+  # Trabajo para desplegar el proyecto (si se quiere hacer un despliegue automático)
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: build  # El despliegue depende de que el trabajo de compilación termine correctamente
+
+    steps:
+      # Paso 1: Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Paso 2: Configurar Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Paso 3: Instalar las dependencias necesarias
+      - name: Install dependencies
+        run: npm install
+
+      # Paso 4: Desplegar el proyecto (por ejemplo, en un servidor)
+      - name: Deploy project
+        run: |
+          # Aquí puedes agregar tus comandos de despliegue, por ejemplo:
+          # Si estás usando un servicio como GitHub Pages o un servidor FTP, usa los comandos correspondientes.
+          echo "Desplegando el proyecto..."
